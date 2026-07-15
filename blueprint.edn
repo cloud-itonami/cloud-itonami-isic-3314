@@ -1,0 +1,79 @@
+{:itonami.blueprint/id "cloud-itonami-isic-3314"
+ :itonami.blueprint/name "Repair of Electrical Equipment"
+ :itonami.blueprint/isic-rev5 "3314"
+ :itonami.blueprint/domain :manufacturing/electrical-equipment-repair
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:worker-safety :repair-access :circular-economy-repair-over-replace]
+ :itonami.blueprint/governor :electrical-equipment-repair-governor
+ :itonami.blueprint/robotics false
+ :itonami.blueprint/required-technologies [:identity :forms :audit-ledger]
+ :itonami.blueprint/optional-technologies []
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "`:electrical-equipment-repair-governor` is implemented end-to-end in
+ `src/electrical_equipment_repair` as a REPAIR-SHOP OPERATIONS
+ COORDINATION actor -- Repair Advisor (LLM proposal-only) ⊣ Repair
+ Governor (closed-op-allowlist / equipment-verification / legal-basis /
+ unresolved-concern hard-gates). ISIC 3314 covers repair of electrical
+ equipment specifically -- motors, generators, transformers and
+ switchgear -- distinct from the more specific/other repair classes 3311
+ (fabricated metal products), 3312 (machinery and equipment), 3313
+ (electronic and optical equipment), 3315 (transport equipment) and the
+ residual class 3319 (other equipment). This actor deliberately holds NO
+ repair-equipment/diagnostic-tool control authority and NO
+ return-to-service/re-energization sign-off authority (both are HARD,
+ permanent governor blocks, never overridable by human approval -- see
+ `electrical-equipment-repair.governor` ns docstring), the SAME
+ coordination-only, narrower-than-4211 shape `cloud-itonami-isic-3320`
+ (Installation of Industrial Machinery and Equipment) and
+ `cloud-itonami-isic-3319` (Repair of Other Equipment) already established
+ in this fleet. Every one of its four proposal ops (`:log-repair-record` /
+ `:schedule-repair-operation` / `:flag-safety-concern` / `:order-
+ supplies`) carries `:effect :propose` ONLY -- the governor HARD-holds any
+ proposal that doesn't (`effect-not-propose-violations`), a structural
+ invariant distinguishing this actor from siblings that DO commit
+ real-world actuation effects.
+
+ UNLIKE `cloud-itonami-isic-3320` (whose `:schedule-installation-
+ operation` ALWAYS escalates to a human, at every phase, because it
+ coordinates potential heavy-lift/rigging-equipment dispatch), THIS
+ actor's `:schedule-repair-operation` MAY auto-commit at phase 3 when the
+ governor is completely clean -- equipment/work-order independently
+ verified, a per-jurisdiction de-energization-before-repair legal basis on
+ file, and no unresolved safety concern on record. This is the SAME
+ escalation shape `cloud-itonami-isic-3319` uses, deliberately extended to
+ this class even though electrical equipment (motors, generators,
+ transformers, switchgear) carries a genuinely higher intrinsic electrical
+ hazard (arc-flash, stored/residual voltage in capacitors, insulation
+ breakdown) than 3319's furniture/sporting-goods/musical-instrument
+ residual scope: the schedule op itself is still only ever a proposed
+ diagnostic/repair/testing WINDOW, never a live-work authorization, a
+ repair-equipment/diagnostic-tool control command, or a return-to-service/
+ re-energization sign-off -- and this actor's own HARD checks (equipment-
+ verification, legal-basis-on-file citing the jurisdiction's own
+ de-energization-before-repair duty, no-unresolved-safety-concern) plus
+ its forbidden-action-class block on any `:re-energization-sign-off?`
+ marker already gate the actual electrical-hazard surface independently
+ of phase. `:flag-safety-concern` is the ONLY permanent, unconditional
+ `high-stakes` member in `electrical-equipment-repair.governor` -- see
+ that ns docstring 'Actuation' section for the full rationale.
+
+ Per-jurisdiction (JPN/USA/DEU) pre-repair de-energization/re-energization
+ legal-basis catalog (`electrical-equipment-repair.facts`) with real
+ official sources -- all THREE seeded jurisdictions are honestly
+ `:qualitative` here (a procedural de-energize-before-work / verify-
+ de-energized / qualified-personnel duty, plus (JPN, DEU) an explicit
+ pre-re-energization or pre-return-to-service check duty, not a fixed
+ numeric notice-lead-time), the same honest-coverage convention
+ `installation.facts`/`demolition.facts`/`construction.facts`/`other-
+ equipment-repair.facts` establish. This actor does not invent a
+ numeric lead-time count where none of its three researched
+ jurisdictions' electrical safety law gives one for repair work itself.
+ This build ships NO JVM-only interop anywhere in `src/` (no real
+ Resend/Twilio transports -- `electrical-equipment-repair.notify` ships
+ only the portable mock notifier + `Notifier` protocol seam) per this
+ workspace's cljs-first `.cljc` runtime-priority rule. `:flag-safety-
+ concern` ALWAYS escalates to a human, at every phase, unconditionally.
+ See `docs/` -- README `Actuation` section -- for the full governor-check
+ enumeration and the rationale for each hard/soft rule."}
