@@ -1,0 +1,50 @@
+name: ci
+
+# Workspace layout: deps use :local/root to kotoba-lang/langgraph and
+# kotoba-lang/langchain-store (public). store.cljc genuinely depends on
+# langchain-store's ls/enc / ls/pull->map machinery, and langchain-store
+# itself :local/root's to kotoba-lang/langchain -- CI reconstructs all
+# three sibling paths.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with: { cli: latest }
+      - name: clj-kondo (errors fail the build)
+        run: clojure -M:lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: orgs/cloud-itonami/cloud-itonami-isic-3314 }
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/langgraph
+          path: orgs/kotoba-lang/langgraph
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/langchain-store
+          path: orgs/kotoba-lang/langchain-store
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/langchain
+          path: orgs/kotoba-lang/langchain
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with: { cli: latest }
+      - name: test (governor · store parity · phases)
+        working-directory: orgs/cloud-itonami/cloud-itonami-isic-3314
+        run: clojure -M:dev:test
