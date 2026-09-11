@@ -2466,7 +2466,7 @@ img,svg { max-width: 100%; height: auto; }</style></head><body>
   <h1>Repair of electrical equipment (ISIC 3314) &mdash; Operator Console</h1>
 </header>
 <p><span class="badge">read-only sample</span> <span class="badge">governor-gated</span> <span class="badge">coordination-only &middot; every effect is :propose</span></p>
-<p class="subtitle">Generated at build time by <code>electrical-equipment-repair.render-html</code> (<code>clojure -M:dev:render-html</code>) by actually running the compiled <code>electrical-equipment-repair.operation</code> StateGraph over a freshly seeded store. Every value below was read back out of that run &mdash; there is no mock markup on this page, and no timestamp, so successive regenerations are byte-identical.</p>
+<p class="subtitle">Generated at build time by <code>electrical-equipment-repair.render-html</code> (<code>kbb -M:dev:render-html</code>) by actually running the compiled <code>electrical-equipment-repair.operation</code> StateGraph over a freshly seeded store. Every value below was read back out of that run &mdash; there is no mock markup on this page, and no timestamp, so successive regenerations are byte-identical.</p>
 <main>
   <section class="card">
     <h2>Run summary</h2>
@@ -2666,6 +2666,6 @@ This is a COORDINATION NOTICE only -- it proposes nothing about repair-equipment
   return-to-service or re-energization &mdash; that authority is the licensed repair technician's
   exclusively. Every proposal carries <code>:effect :propose</code>; committing one means a
   coordination artifact was logged, never that anything was energized.</p>
-  <p>Regenerate: <code>clojure -M:dev:render-html</code></p>
+  <p>Regenerate: <code>kbb -M:dev:render-html</code></p>
 </footer>
 </body></html>
