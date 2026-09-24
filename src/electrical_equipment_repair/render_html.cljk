@@ -60,7 +60,7 @@
 
   Usage: `kbb -M:dev:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
-  (:require [kotoba.lang.text :as str]
+  (:require [kotoba.io :as kio] [kotoba.lang.text :as str]
             [jp-go-dds.skin]
             [langgraph.graph :as g]
             [electrical-equipment-repair.advisor :as advisor]
@@ -484,8 +484,8 @@
                            ": the run produced ZERO :committed facts, so the console would show "
                            "no clean/approved path at all.")
                       {:out out :ledger-facts (count ledger) :committed 0})))
-    (let [f (java.io.File. ^String out)]
-      (when-let [p (.getParentFile f)] (.mkdirs p)))
+    (let [f (kio/file ^String out)]
+      (when-let [p (kio/parent-file f)] (kio/mkdirs p)))
     (spit out (render result))
     (println "wrote" out
              (str "(" (count ledger) " ledger facts, "
